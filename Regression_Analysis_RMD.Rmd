@@ -1,0 +1,434 @@
+---
+title: "Regression Analysis"
+author: "Britni Barcelo"
+date: "2025-03-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1.Set up the work space
+
+First I want to reduce the number of displayed digits.
+
+```{r}
+options(
+  digits = 4
+)
+```
+
+
+## 1. Load the data
+```{r}
+grad_admission <- read.csv(
+  file = "C:\\Users\\britn\\Downloads\\Grad_Admission.csv",
+  header = TRUE
+)
+```
+
+## 2. Print the dataset
+```{r}
+grad_a <- subset(grad_admission, select = -c(ID))
+head(grad_a,10)
+```
+## 3. Print the table for GRE, TOEFL, and CGPA
+```{r}
+summary(
+  object = grad_a
+)
+```
+The three variables I'm choosing are GRE, TOEFL, and CGPA.
+variables_of_choice <- grad_a[,c("GRE", "TOEFL", "CGPA")]
+
+variable_stats_table <- data.frame(
+  min = apply(variables_of_choice, 2, min),
+  q1 = apply(variables_of_choice, 2, quantile, 0.25),
+  median = apply(variables_of_choice, 2, median),
+  mean = apply(variables_of_choice, 2, mean),
+  q3 = apply(variables_of_choice, 2, quantile, 0.75),
+  max = apply(variables_of_choice, 2, max)
+)
+
+print(variable_stats_table)
+
+## 4. Make histograms
+I will now make histograms for the variables Chance, CGPA, GRE, and TOEFL.
+```{r}
+hist(grad_a$Chance, xlab = 'Chance', ylab = 'Frequency', main = 'Histogram of Chance')
+```
+```{r}
+hist(grad_a$CGPA, xlab = 'CGPA', ylab = 'Frequency', main = 'Histogram of CGPA')
+```
+```{r}
+hist(grad_a$GRE, xlab = 'GRE', ylab = 'Frequency', main = 'Histogram of GRE')
+```
+```{r}
+hist(grad_a$TOEFL, xlab = 'TOEFL', ylab = 'Frequency', main = 'Histogram of TOEFL')
+```
+
+The "Chance" histogram is somewhat normally distributed.
+The "CGPA" histogram is somewhat normally distributed.
+The "GRE" histogram is normally distributed.
+The "TOEFL" histogram is normally distributed.
+
+## 5. Scatter plots with Chance as the response variable
+
+Scatter plot 1 - Chance, GRE
+```{r}
+par(
+  mfrow=c(1,1)
+)
+plot(
+  x = grad_a$GRE,
+  y = grad_a$Chance,
+  xlab="GRE", 
+  ylab="Chance"
+)
+```
+The resulting scatter plot shows a relationship between Chance and GRE. The relationship seems linear.
+
+Scatter plot 2 - Chance and TOEFL
+```{r}
+par(
+  mfrow=c(1,1)
+)
+plot(
+  x = grad_a$TOEFL,
+  y = grad_a$Chance,
+  xlab="TOEFL", 
+  ylab="Chance"
+)
+```
+The resulting scatter plot shows a relationship between Chance and TOEFL. The relationship seems linear.
+
+Scatter plot 3 - Chance and Urate
+```{r}
+par(
+  mfrow=c(1,1)
+)
+plot(
+  x = grad_a$Urate,
+  y = grad_a$Chance,
+  xlab="Urate", 
+  ylab="Chance"
+)
+```
+The resulting scatter plot shows a slight relationship between Chance and Urate. The relationship seems to be a bit linear.
+
+Scatter plot 4 - Chance and SOP
+```{r}
+par(
+  mfrow=c(1,1)
+)
+plot(
+  x = grad_a$SOP,
+  y = grad_a$Chance,
+  xlab="SOP", 
+  ylab="Chance"
+)
+```
+The resulting scatter plot shows a slight relationship between Chance and SOP. This relationship seems to be quite similar to the relationship between Chance and Urate, though with more points. 
+
+Scatter plot 5 - Chance and LOR
+```{r}
+par(
+  mfrow=c(1,1)
+)
+plot(
+  x = grad_a$LOR,
+  y = grad_a$Chance,
+  xlab="LOR", 
+  ylab="Chance"
+)
+```
+The resulting scatter plot shows a slight relationship between Chance and LOR. Just like with Urate and SOP, the relationship seems to be slightly linear.
+
+Scatter plot 6 - Chance and CGPA
+```{r}
+par(
+  mfrow=c(1,1)
+)
+plot(
+  x = grad_a$CGPA,
+  y = grad_a$Chance,
+  xlab="CGPA", 
+  ylab="Chance"
+)
+```
+The resulting scatter plot shows a relationship between Chance and CGPA. The relationship between the two variables is linear.
+
+## 7. Validity of the 5 major linear regression assumptions
+The following plots test the validity of the 5 major linear regression assumptions: Existence, Independence, Linearity, Homoscedasticity, and Normal Distribution.
+```{r}
+lm_cg <- lm(
+  formula = Chance ~ GRE,
+  data = grad_a
+)
+plot(lm_cg)
+```
+```{r}
+lm_ct <- lm(
+  formula = Chance ~ TOEFL,
+  data = grad_a
+)
+plot(lm_ct)
+```
+```{r}
+lm_cu <- lm(
+  formula = Chance ~ Urate,
+  data = grad_a
+)
+plot(lm_cu)
+```
+```{r}
+lm_cs <- lm(
+  formula = Chance ~ SOP,
+  data = grad_a
+)
+plot(lm_cs)
+```
+```{r}
+lm_cl <- lm(
+  formula = Chance ~ LOR,
+  data = grad_a
+)
+plot(lm_cl)
+```
+```{r}
+lm_cc <- lm(
+  formula = Chance ~ CGPA,
+  data = grad_a
+)
+plot(lm_cc)
+```
+The "Residuals vs Fitted" plots for GRE, TOEFL, and CGPA show a good model of linearity. The horizontal line is roughly around 0 for each plot, and the data points are randomly scattered across the plot. There are no obvious outliers, and there is no noticeable trend within the residuals. The way the residuals are randomly scattered shows that the relationship is linear. The plot for Urate, SOP, and LOR, aren't as good of a model as the variables previously mentioned. Their residuals aren't exactly "randomly" spread, and have more of a noticeable trend. Though one can say that the data has somewhat of a linear pattern, the points aren't as randomly and equally scattered as the other plots.  
+However, in these plots, there are a few points that we should keep an eye on, as they are farther away from the other residuals. Points such as 10, 92, 93, and 375, show up in multiple plots.
+
+Though the residuals aren't perfectly linear and don't take the shape of the dotted line flawlessly, the "Q-Q Residuals" plots shows that the residuals are mostly linear. Once again, the points mentioned previously are also slightly further away from the other residuals, so we continue to keep an eye on them.
+
+I can see a similar patter in the "Scale-Location" plots as seen in the "Residuals vs Fitted" plots. GRE, TOEFL, and CGPA, all have evenly scattered residuals that fit within the rather horizontal line, and show an even variance within the data. However, as seen before, the plots for Urate, SOP, and LOR have a distinct pattern within the points. Though, the red line still is rather horizontal, so I suppose the models aren't entirely "bad".
+
+The other 2 assumptions, existence and independence, can be verified through having an understanding of the data set. Existence is always true for every regression model: every X value does, in fact, have a random Y value, and have probability distributions with finite mean and variance. Independence is invalid when the Y values are not statistically independent from one another. In this data set, the Y values are independent from one another, so the assumption is valid. 
+
+## 8. The best 3 independent variables
+Based on my immediate insight into the relationship, I would say the best 3 independent variables are GRE, TOEFL, and CGPA. These relationships have "good" models (as seen above), and probably influence Y greater than the other independent variables.
+```{r}
+lm_cgtc <- lm(
+  formula = Chance ~ GRE + TOEFL + CGPA,
+  data = grad_a
+)
+summary(
+  object = lm_cgtc
+)
+```
+The model is as follows:
+Y = -158.5046 + 0.2259X1 + 0.3118X2 + 36.6037X3
+With Y = Chance, X1 = GRE, X2 = TOEFL, and X3 = CGPA
+
+## 9. Correlation Table
+```{r}
+correlation <- cor(grad_a)
+correlation
+```
+Based on the table above, we can deduce that all independent variables have a pretty high correlation with the dependent variable, though some are greater than others. The coefficients with a higher value (meaning they have a greater correlation to Y), show that they are more influential towards Y in the regression equation. We can see that the 3 variables, GRE, TOEFL, and CGPA, have the 3 highest correlations, which coincides with my prediction (that they are the best 3 independent variables) previously stated. We can also conclude that the independent variable, CGPA, has the highest correlation with Chance (Y), with the correlation being 0.8733827. 
+
+## 10. Hypothesis Testing
+Hypothesis testing for GRE:
+H0: ρ_1 == 0 vs HA: ρ_1 != 0
+T.S. : r = 0.8026
+summary(
+  object = lm_cg
+)
+p-value = <2e-16 < 0.05
+Conclusion: Reject H0!
+
+Hypothesis testing for TOEFL:
+H0: ρ_2 == 0 vs HA: ρ_2 != 0
+T.S. : r = 0.7916
+summary(
+  object = lm_ct
+)
+p-value = <2e-16 < 0.05
+Conclusion: Reject H0!
+
+Hypothesis testing for Urate:
+H0: ρ_3 == 0 vs HA: ρ_3 != 0
+T.S. : r = 0.7113
+summary(
+  object = lm_cu
+)
+p-value = <2e-16 < 0.05
+Conclusion: Reject H0!
+
+Hypothesis testing for SOP:
+H0: ρ_4 == 0 vs HA: ρ_4 != 0
+T.S. : r = 0.6757
+summary(
+  object = lm_cs
+)
+p-value = <2e-16 < 0.05
+Conclusion: Reject H0!
+
+Hypothesis testing for LOR:
+H0: ρ_5 == 0 vs HA: ρ_5 != 0
+T.S. : r = 0.6699
+summary(
+  object = lm_cl
+)
+p-value = <2e-16 < 0.05
+Conclusion: Reject H0!
+
+Hypothesis testing for CGPA:
+H0: ρ_6 == 0 vs HA: ρ_6 != 0
+T.S. : r = 0.8734
+summary(
+  object = lm_cc
+)
+p-value = <2e-16 < 0.05
+Conclusion: Reject H0!
+
+## 11. Straight-line Regression Models
+Chance and GRE:
+```{r}
+plot(grad_a$GRE, grad_a$Chance)
+abline(lm_cg, col = "red")
+summary(lm_cg)
+```
+H_0 : B1 == 0
+H_a : B1 != 0
+T.S. : t value = 26.8
+p-value = 2e-16 < 0.05
+Reject H_0!
+
+Chance and TOEFL:
+```{r}
+plot(grad_a$TOEFL, grad_a$Chance)
+abline(lm_ct, col = "red")
+summary(lm_ct)
+```
+H_0 : B2 == 0
+H_a : B2 != 0
+T.S. : t value = 25.8
+p-value = 2e-16 < 0.05
+Reject H_0!
+
+Chance and Urate:
+```{r}
+plot(grad_a$Urate, grad_a$Chance)
+abline(lm_cu, col = "red")
+summary(lm_cu)
+```
+H_0 : B3 == 0
+H_a : B3 != 0
+T.S. : t value = 20.2
+p-value = 2e-16 < 0.05
+Reject H_0!
+
+Chance and SOP:
+```{r}
+plot(grad_a$SOP, grad_a$Chance)
+abline(lm_cs, col = "red")
+summary(lm_cs)
+```
+H_0 : B4 == 0
+H_a : B4 != 0
+T.S. : t value = 18.3
+p-value = 2e-16 < 0.05
+Reject H_0!
+
+Chance and LOR:
+```{r}
+plot(grad_a$LOR, grad_a$Chance)
+abline(lm_cl, col = "red")
+summary(lm_cl)
+```
+H_0 : B5 == 0
+H_a : B5 != 0
+T.S. : t value = 18.0
+p-value = 2e-16 < 0.05
+Reject H_0!
+
+Chance and CGPA:
+```{r}
+plot(grad_a$CGPA, grad_a$Chance)
+abline(lm_cc, col = "red")
+summary(lm_cc)
+```
+H_0 : B6 == 0
+H_a : B6 != 0
+T.S. : t value = 35.5
+p-value = 2e-16 < 0.05 
+Reject H_0!
+
+## 12. ANOVA Table for Chance/CGPA and Chance/GRE
+```{r}
+anova(
+  object = lm_cc
+)
+summary(lm_cc)
+anova(
+  object = lm_cg
+)
+summary(lm_cg)
+```
+Based on the ANOVA tables for the two variables with the highest R-squared values, CPGA has a higher R-squared value compared to GRE. The tables shows that CGPA explains approximately 76.3% of the variance in Chance, while GRE explains approximately 64.4% of the variance in Chance. Between these two independent variables, CGPA has more significance/is more influential towards Chance.
+
+## 13. Model
+```{r}
+lm_cgtuslc <- lm(
+  formula = Chance ~ GRE + TOEFL + Urate + SOP + LOR + CGPA,
+  data = grad_a
+)
+anova(
+  object = lm_cgtuslc
+)
+summary(lm_cgtuslc)
+
+lm_cgtlc <- lm(
+  formula = Chance ~ GRE + TOEFL + LOR + CGPA,
+  data = grad_a
+)
+anova(lm_cgtlc,lm_cgtuslc)
+```
+According to the model, not all independent variables are significant. The variables Urate and SOP, both have p-values greater than 0.05, which show that they do not hold any significance at this significance level.
+
+## 14. Model Re-build
+```{r}
+anova(
+  object = lm_cgtlc
+)
+summary(lm_cgtlc)
+```
+In the ANOVA table above, the "Sum Sq" and "Mean Sq" of CGPA and LOR has changed considerably, going from 3923 to 4469, and 1574 to 4090, respectively. The F value for all four of these significant variables have also changed considerably, with the values going from 1258.2, 94.4, 37.9, and 94.4, to 1259.6, 94.5, 98.6, and 107.7, respectively. 
+
+## 15. Confidence and Prediction Bands
+Confidence interval for all variables
+```{r}
+confidence_intervals <- predict(lm_cgtuslc, grad_a, interval = c("confidence"))
+print(confidence_intervals)
+```
+confidence <- data.frame(confidence_intervals)
+write.csv(confidence,"C:\\Users\\britn\\Downloads\\Confidence.csv", row.names = TRUE)
+
+
+Prediction intervals for all variables
+```{r}
+prediction_intervals <- predict(lm_cgtuslc, grad_a, interval = c("prediction"))
+print(prediction_intervals)
+```
+prediction <- data.frame(confidence_intervals)
+write.csv(prediction,"C:\\Users\\britn\\Downloads\\Prediction.csv", row.names = TRUE)
+
+## 16. Predicting the Admission Chance
+The prediction equation for the admission chance would be:
+Y_hat = -146.2511 + 0.2311GRE + 0.2929TOEFL + 2.3960LOR + 30.7403CGPA
+The intercept indicates the chance of admission when all independent variable coefficients are 0. Because it is negative, if all independent variable coefficients were 0, the chance of admission is extremely low -- it's negative.
+The slopes of the equation indicates the change in Chance for every 1-unit increase in a certain independent variable. Since each independent variable coefficient is positive, that shows that there is a higher chance of admission.
+
+## 17. Conclusion!
+I believe that descriptive statistics provides clear answers towards questions regarding data distribution, patterns in residuals, etc. Descriptive statistics successfully summarized attributes of the data set, along with showcasing different measures of the data set, such as variance and standard deviation. Regression analysis provides help in understanding relationships between variables in the data set. In this project, regression has especially helped in showing just what variables are significant versus which ones aren't, and provided a clear visual through the models and tables. 
+I would recommend future data explorations to include other statistical techniques, since descriptive statistics has some disadvantages to using it. Descriptive statistics cannot showcase conclusions, such as generalizations and causality, about large populations, since it can only effectively draw conclusions about a particular data set. It also can cause misunderstandings or bad interpretations, especially when data sets have many influential outliers or have non-normal skewness.
+
+
