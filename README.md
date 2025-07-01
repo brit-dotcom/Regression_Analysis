@@ -8,4 +8,4 @@ Project consists of regression analysis done on a graduate admission CSV file. B
 - RStudio
 
 # Environments Used
-- Windows 10
+- Windows 11
